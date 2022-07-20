@@ -1,9 +1,9 @@
-import sys
-
 import argparse
 import configparser
-import logbook
 import os
+import sys
+
+import logbook
 
 from dao import TestDbHandler
 
@@ -63,26 +63,26 @@ class HelloWorldConnDb(object):
 
     def run(self):
         self.init()
-        self.logger.info("Starting %s" % self.filename)
+        self.logger.info(f"Starting {self.filename}")
 
         self.logger.info("Get All Active Campaigns")
         records = self.db.get_active_campaigns()
         for row in records:
-            self.logger.info("Campaign #%d: %s" % (row.id, row.campaign_name))
+            self.logger.info(f"Campaign #{row.id}: {row.campaign_name}")
 
         campaign_id = 330
         tracking_method = -2
         rowcount = self.db.set_tracking_method(campaign_id, tracking_method)
-        self.logger.info("Set Tracking of Campaign #%d = %d, with status %d" % (campaign_id, tracking_method, rowcount))
+        self.logger.info(f"Set Tracking of Campaign #{campaign_id} = {tracking_method}, with status {rowcount}")
 
         records = self.db.get_campaign_detail(campaign_id)
         if len(records) > 0:
             row = records[0]
-            self.logger.info("Campaign #%d: %s" % (row.id, row.campaign_name))
-            self.logger.info("  start: %s - %s" % (str(row.campaign_start), str(row.campaign_end)))
-            self.logger.info("  tracking_method: %d" % row.tracking_method)
+            self.logger.info(f"Campaign #{row.id}: {row.campaign_name}")
+            self.logger.info(f"  start: {row.campaign_start} - {row.campaign_end}")
+            self.logger.info(f"  tracking_method: {row.tracking_method}")
 
-        self.logger.info("Finish %s" % self.filename)
+        self.logger.info(f"Finish {self.filename}")
 
 
 def main():

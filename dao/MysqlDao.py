@@ -1,4 +1,5 @@
 import logging
+
 import mysql.connector
 from mysql.connector import pooling
 
@@ -15,13 +16,13 @@ class MysqlConnectionFactory(object):
     connection_pool = None
 
     @staticmethod
-    def get_instance(_host, _port, _user, _pass, _dbname):
+    def get_instance(_host, _port, _user, _pass, _dbname, pool_size=1):
         """ Static access method. """
         if MysqlConnectionFactory._instance is None:
-            MysqlConnectionFactory(_host, _port, _user, _pass, _dbname)
+            MysqlConnectionFactory(_host, _port, _user, _pass, _dbname, pool_size=pool_size)
         return MysqlConnectionFactory._instance
 
-    def __init__(self, _host, _port, _user, _pass, _dbname):
+    def __init__(self, _host, _port, _user, _pass, _dbname, pool_size=1):
         """ Virtually private constructor. """
         if MysqlConnectionFactory._instance is not None:
             raise Exception("{} is a singleton!".format(__name__))
@@ -31,13 +32,14 @@ class MysqlConnectionFactory(object):
             self._user = _user
             self._pass = _pass
             self._dbname = _dbname
-            self.connection_pool = mysql.connector.pooling.MySQLConnectionPool(pool_name="pynative_pool",
-                                                                               pool_size=5,
-                                                                               pool_reset_session=True,
-                                                                               host=self._host,
-                                                                               database=self._dbname,
-                                                                               user=self._user,
-                                                                               password=self._pass)
+            self.connection_pool = mysql.connector.pooling.MySQLConnectionPool(
+                pool_name="pynative_pool",
+                pool_size=pool_size,
+                pool_reset_session=True,
+                host=self._host,
+                database=self._dbname,
+                user=self._user,
+                password=self._pass)
             MysqlConnectionFactory._instance = self
 
     def get_connection(self):
@@ -48,9 +50,9 @@ class MysqlDao(object):
     connection = None
     logger = None
 
-    def __init__(self, _host, _port, _user, _pass, _dbname):
+    def __init__(self, _host, _port, _user, _pass, _dbname, pool_size=1):
         """ Virtually private constructor. """
-        conn_factory = MysqlConnectionFactory.get_instance(_host, _port, _user, _pass, _dbname)
+        conn_factory = MysqlConnectionFactory.get_instance(_host, _port, _user, _pass, _dbname, pool_size=pool_size)
         self.logger = logging.getLogger()
         self.connection = conn_factory.get_connection()
         MysqlDao._instance = self

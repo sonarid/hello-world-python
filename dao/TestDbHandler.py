@@ -6,16 +6,17 @@ from dao.MysqlDao import MysqlDao
 class TestDbHandler(MysqlDao):
 
     @staticmethod
-    def getInstance(_host, _port, _user, _pass, _dbname):
+    def get_instance(_host, _port, _user, _pass, _dbname):
         return TestDbHandler(_host, _port, _user, _pass, _dbname)
 
     @staticmethod
-    def instantiate_from_configparser(cfg, logger):
+    def instantiate_from_configparser(cfg, logger, section_name=None):
         if isinstance(cfg, configparser.ConfigParser):
-            dbhandler = TestDbHandler.getInstance(cfg.get('Database', 'host'), cfg.get('Database', 'port'),
-                                                  cfg.get('Database', 'username'),
-                                                  cfg.get('Database', 'password'),
-                                                  cfg.get('Database', 'dbname'))
+            if not section_name:
+                section_name = 'Database'
+            dbhandler = TestDbHandler.get_instance(
+                cfg.get(section_name, 'host'), cfg.get(section_name, 'port'), cfg.get(section_name, 'username'),
+                cfg.get(section_name, 'password'), cfg.get(section_name, 'dbname'))
             dbhandler.setLogger(logger)
             return dbhandler
         else:
